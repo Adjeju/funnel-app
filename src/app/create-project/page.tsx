@@ -12,26 +12,26 @@ import { stepperValidationSchema } from "./validation/stepperValidationSchema";
 import Stepper from "../components/Stepper";
 import Image from "next/image";
 import gradientSvg from "../../../public/gradient.svg";
-import { createElement, useRef } from "react";
+import { createElement } from "react";
 import { Project } from "../types/Project";
-import Button from "../components/Button";
-import { LOCAL_STORAGE_PROJECT_KEY } from "../../../utils/getProjects";
+import {
+  LOCAL_STORAGE_PROJECT_KEY,
+  getProjects,
+} from "../../../utils/getProjects";
+import dynamic from "next/dynamic";
 
 const stepToComponent = [AddProjectStep, GoalStep, CreateProjectStep];
 
 type CreateProjectFormFields = Project;
 
-const getProjects = () => {
-  const storedProjects = localStorage.getItem(LOCAL_STORAGE_PROJECT_KEY);
-  const projects = storedProjects ? JSON.parse(storedProjects) : [];
-  return projects;
-};
+const DynamicBackToProjectsButton = dynamic(
+  () => import("../components/BackToProjectsButton"),
+  { ssr: false }
+);
 
 export default function Home() {
   const router = useRouter();
   const { activeStep, completed } = useStepperContext();
-
-  const isProjectExistsRef = useRef(getProjects().length > 0);
 
   const methods = useForm({
     defaultValues: formDefaultValues,
@@ -66,14 +66,7 @@ export default function Home() {
           className="mt-5 md:py-24 md:m-0 md:px-12"
         >
           {createElement(stepToComponent[activeStep])}
-          {isProjectExistsRef.current && (
-            <Button
-              onClick={() => router.push("/")}
-              className="w-full md:w-44 mt-5"
-            >
-              Back to projects
-            </Button>
-          )}
+          <DynamicBackToProjectsButton />
         </form>
       </FormProvider>
     </div>

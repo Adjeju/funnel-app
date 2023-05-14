@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import Button from "./components/Button";
 import { Project } from "./types/Project";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ProjectsCard from "./components/ProjectsCard";
 import {
   LOCAL_STORAGE_PROJECT_KEY,
@@ -16,10 +16,11 @@ export default function Home() {
 
   const projects: Project[] = getProjects();
 
-  if (!projects.length) {
-    router.push("/create-project");
-    return;
-  }
+  useEffect(() => {
+    if (!projects.length) {
+      router.push("/create-project");
+    }
+  }, [projects.length, router]);
 
   const handleDeleteProject = (projectName: string) => {
     if (projects.length <= 1) {
